@@ -30,14 +30,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Use the custom CORS configuration defined below
                 .cors(Customizer.withDefaults())
+                // Disable CSRF protection for stateless REST APIs
                 .csrf(csrf -> csrf.disable())
+                // Configure authorization rules for your endpoints
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/books/public", "/api/books/proxy-epub").permitAll()
+                        // --- THIS IS THE UPDATED LINE ---
+                        // We are adding "/api/v1/books/**" to the list of public URLs.
+                        // The '/**' wildcard makes all sub-paths public as well (e.g., /api/v1/books/123)
+                        .requestMatchers(
+                                "/api/auth/**",       // Authentication endpoints (login, register)
+                                "/api/v1/books/**",   // All book-related endpoints
+                                "/api/books/public",  // Your existing public endpoints
+                                "/api/books/proxy-epub"
+                        ).permitAll()
+                        // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
+                // Configure session management to be stateless, as we use JWTs
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        // Add your custom JWT filter to the security chain before the default username/password filter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -46,16 +60,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Set the allowed origins for your frontend applications
         configuration.setAllowedOrigins(Arrays.asList(
                 "https://digital-library-eight-delta.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:5173"
         ));
+        // Set the allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allow all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        // Allow credentials (cookies, authorization headers)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Apply this CORS configuration to all paths
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
