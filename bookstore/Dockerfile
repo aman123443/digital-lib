@@ -24,6 +24,8 @@ WORKDIR /app
 COPY --from=builder /app/target/bookstore-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
+ENV DATABASE_URL="jdbc:postgresql://test:test@test/test"
+
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
