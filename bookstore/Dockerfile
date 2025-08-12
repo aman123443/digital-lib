@@ -14,11 +14,13 @@ RUN mvn clean package -DskipTests
 # #############################################################################
 # Stage 2: The "Final" Stage - Create the lightweight production image
 # #############################################################################
-FROM openjdk:17-jre-slim
+# THE FIX is on the next line: using a current, valid Java 17 JRE image
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
 # Copy ONLY the final .jar file from the "builder" stage
+# Make sure your JAR file name here is correct, or use a wildcard
 COPY --from=builder /app/target/bookstore-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
