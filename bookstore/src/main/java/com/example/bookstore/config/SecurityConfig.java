@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Your existing public endpoints
-                        .requestMatchers("/api/auth/**", "/api/v1/books/public").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/v1/books/public","/health").permitAll()
 
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
