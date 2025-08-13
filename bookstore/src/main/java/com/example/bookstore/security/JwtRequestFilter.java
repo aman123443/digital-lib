@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -37,14 +38,28 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
+        final String requestURI = request.getRequestURI();
 
-        // ✅ Skip JWT check for public auth endpoints
-        if (path.startsWith("/api/auth/")) {
+        // --- THIS IS THE UPDATED LOGIC ---
+        // A list of all public endpoints that should be ignored by the JWT filter.
+        List<String> publicEndpoints = List.of(
+                "/api/auth",
+                "/api/v1/books",
+                "/api/books/public",
+                "/api/books/proxy-epub"
+        );
+
+        // Check if the current request URI starts with any of the public endpoint prefixes.
+        boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(requestURI::startsWith);
+
+        if (isPublicEndpoint) {
+            // If it's a public endpoint, skip the JWT validation and continue the filter chain.
             chain.doFilter(request, response);
             return;
         }
 
+
+        // --- EXISTING JWT VALIDATION LOGIC FOR PROTECTED ENDPOINTS ---
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
