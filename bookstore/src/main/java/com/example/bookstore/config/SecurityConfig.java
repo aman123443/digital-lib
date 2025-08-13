@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints are now correctly defined
-                        .requestMatchers("/api/auth/**", "/api/v1/books/public").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/v1/books/public","/health").permitAll()
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
