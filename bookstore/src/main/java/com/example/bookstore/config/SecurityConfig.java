@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "https://digital-library-eight-delta.vercel.app",
+                "https://digital-lib-ut2y.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:5173"
         ));
