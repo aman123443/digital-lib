@@ -40,26 +40,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String requestURI = request.getRequestURI();
 
-        // --- THIS IS THE UPDATED LOGIC ---
-        // A list of all public endpoints that should be ignored by the JWT filter.
+        // This list now correctly matches the SecurityConfig
         List<String> publicEndpoints = List.of(
                 "/api/auth",
-                "/api/v1/books",
-                "/api/books/public",
-                "/api/books/proxy-epub"
+                "/api/v1/books/public"
         );
 
-        // Check if the current request URI starts with any of the public endpoint prefixes.
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(requestURI::startsWith);
 
         if (isPublicEndpoint) {
-            // If it's a public endpoint, skip the JWT validation and continue the filter chain.
             chain.doFilter(request, response);
             return;
         }
 
-
-        // --- EXISTING JWT VALIDATION LOGIC FOR PROTECTED ENDPOINTS ---
+        // ... rest of your JWT validation logic is fine and does not need changes ...
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;

@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/books")
+// --- THIS IS THE CORRECTED LINE ---
+@RequestMapping("/api/v1/books")
 public class BookController {
 
     @Autowired
@@ -29,10 +30,26 @@ public class BookController {
     private UserRepository userRepository;
 
     /**
-     * This is the final, most robust version of the proxy.
-     * It uses the Apache HttpClient library to reliably download large files
-     * and includes proper error handling. This will solve the "stuck on loading" issue.
+     * This is a public endpoint to get all books.
+     * The full path will be: GET /api/v1/books/public
      */
+    @GetMapping("/public")
+    public List<Book> getPublicBooks() {
+        return bookRepository.findAll();
+    }
+
+    /**
+     * This is a protected endpoint to get books for the logged-in user.
+     * The full path will be: GET /api/v1/books
+     */
+    @GetMapping
+    public List<Book> getBooksForCurrentUser() {
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        return bookRepository.findByUserUsername(username);
+    }
+
+    // ... rest of your controller methods are fine and do not need changes ...
+
     @GetMapping("/proxy-epub")
     public ResponseEntity<byte[]> proxyEpub(@RequestParam String url) {
         // Use a try-with-resources block to ensure the client is always closed
@@ -51,17 +68,6 @@ public class BookController {
             System.err.println("Failed to proxy EPUB from URL: " + url + " - " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @GetMapping("/public")
-    public List<Book> getPublicBooks() {
-        return bookRepository.findAll();
-    }
-
-    @GetMapping
-    public List<Book> getBooksForCurrentUser() {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        return bookRepository.findByUserUsername(username);
     }
 
     @GetMapping("/{id}")
