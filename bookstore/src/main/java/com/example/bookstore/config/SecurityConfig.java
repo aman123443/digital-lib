@@ -4,6 +4,7 @@ import com.example.bookstore.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // <-- Make sure to add this import
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -33,8 +34,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints are now correctly defined
-                        .requestMatchers("/api/auth/**", "/api/v1/books/public","/health").permitAll()
+                        // --- THIS IS THE NEW LINE THAT FIXES THE CORS ERROR ---
+                        // Allow all OPTIONS requests (for CORS preflight)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Your existing public endpoints
+                        .requestMatchers("/api/auth/**", "/api/v1/books/public").permitAll()
+
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
@@ -45,7 +51,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ... all other beans (CorsConfigurationSource, PasswordEncoder, AuthenticationManager) are correct and do not need changes ...
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
