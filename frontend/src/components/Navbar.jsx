@@ -54,9 +54,7 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                             onClose={handleClose}
                         >
                             {/* You can still add links to your pages here in the user dropdown menu */}
-                            <MenuItem component={Link} to="/library" onClick={handleClose}>My Library</MenuItem>
-                            <MenuItem component={Link} to="/store" onClick={handleClose}>Find Books</MenuItem>
-                            <MenuItem component={Link} to="/recommendations" onClick={handleClose}>AI Recommendations</MenuItem>
+                          
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>
