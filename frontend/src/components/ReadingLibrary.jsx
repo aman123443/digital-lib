@@ -1,55 +1,91 @@
-import React from 'react';
-import { Grid, Box, Typography, TextField } from '@mui/material';
-import axios from 'axios';
-import BookCard from './BookCard';
+import React, { useState, useEffect } from 'react';
+import { Grid, Box, Typography, TextField, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
-
-// --- THIS IS THE FIX ---
-// 1. Define the base API URL using the environment variable.
-//    This works for both production (Vercel) and local development.
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+import api from '../services/api'; // Your central axios instance from api.js
 
 const ReadingLibrary = () => {
-  const [books, setBooks] = React.useState([]);
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [books, setBooks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  React.useEffect(() => {
-    // 2. Use the API_URL variable to construct the full request URL.
-    axios.get(`${API_URL}/api/books/public`) // This line is now corrected
-      .then(response => {
+  useEffect(() => {
+    const fetchUserBooks = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        // --- THIS IS THE KEY CHANGE ---
+        // We now fetch from the protected '/api/v1/books' endpoint.
+        // The 'api' object automatically attaches the user's JWT token.
+        const response = await api.get('/v1/books');
         setBooks(response.data);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the public books!", error);
-      });
+      } catch (error) {
+        console.error("There was an error fetching your books!", error);
+        setError('Failed to fetch your library. You may need to log in again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserBooks();
   }, []);
 
   const filteredBooks = books.filter(book =>
-    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+    (book.title && book.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (book.author && book.author.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  if (loading) {
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <CircularProgress />
+            <Typography sx={{ ml: 2 }}>Loading your library...</Typography>
+        </Box>
+    );
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Reading Library
+        My Reading Library
       </Typography>
       <TextField
         fullWidth
-        label="Search by title or author"
+        label="Search your library by title or author"
         variant="outlined"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         sx={{ mb: 3 }}
       />
       <Grid container spacing={3}>
-        {filteredBooks.map(book => (
-          <Grid key={book.id} xs={12} sm={6} md={4} lg={3}>
-            <Link to={`/book/${book.id}`} style={{ textDecoration: 'none' }}>
-              <BookCard book={book} />
-            </Link>
+        {filteredBooks.length > 0 ? filteredBooks.map(book => (
+          <Grid key={book.id} item xs={12} sm={6} md={4} lg={3}>
+            <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography gutterBottom variant="h6" component="div">{book.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">{book.author}</Typography>
+                </CardContent>
+
+                {/* --- NEW BUTTONS ADDED HERE --- */}
+                <CardActions>
+                    {/* The "Read" button navigates to your reader page */}
+                    <Button size="small" component={Link} to={`/read/${book.id}`}>Read</Button>
+
+                    {/* The "Download" button uses the contentUrl if it exists */}
+                    {book.contentUrl && (
+                        <Button size="small" href={book.contentUrl} target="_blank" rel="noopener noreferrer" download>Download</Button>
+                    )}
+                </CardActions>
+            </Card>
           </Grid>
-        ))}
+        )) : (
+            <Typography sx={{ mt: 2, ml: 1 }}>
+                Your library is empty. Go to the 'Book Store Search' page to add some books!
+            </Typography>
+        )}
       </Grid>
     </Box>
   );

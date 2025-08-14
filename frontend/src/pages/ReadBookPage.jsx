@@ -7,12 +7,11 @@ import { Box, Typography, Button, CircularProgress, IconButton, Tooltip, Stack, 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
-// --- THIS IS THE FIX ---
-// 1. Define the base API URL using the environment variable, just like in the other files.
+// Define the base API URL using the environment variable.
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const ReadBookPage = () => {
-    const { id } = useParams();
+    const { id } = useParams(); // Gets the book ID from the URL
     const [book, setBook] = useState(null);
     const [epubData, setEpubData] = useState(null);
     const [loadingMessage, setLoadingMessage] = useState('Loading book details...');
@@ -26,33 +25,34 @@ const ReadBookPage = () => {
             try {
                 setLoadingMessage('Loading book details...');
                 setErrorMessage('');
-                // This 'api.get' call is likely already correct if you have a central api service file
-                const response = await api.get(`/books/${id}`);
+
+                // --- CHANGE 1: Corrected the API path to include '/v1' ---
+                // This now matches the @RequestMapping("/api/v1/books") in your backend controller.
+                const response = await api.get(`/v1/books/${id}`);
                 const bookData = response.data;
                 setBook(bookData);
 
                 if (bookData && bookData.contentUrl) {
                     setLoadingMessage('Downloading e-book (this may take a moment)...');
 
-                    // --- THIS LINE IS NOW CORRECTED ---
-                    // 2. It now uses the API_URL variable instead of the hardcoded localhost.
-                    const proxyUrl = `${API_URL}/api/books/proxy-epub?url=${encodeURIComponent(bookData.contentUrl)}`;
+                    // --- CHANGE 2: Corrected the proxy URL path to include '/v1' ---
+                    const proxyUrl = `${API_URL}/api/v1/books/proxy-epub?url=${encodeURIComponent(bookData.contentUrl)}`;
 
                     const epubResponse = await axios.get(proxyUrl, {
                         responseType: 'arraybuffer',
-                        timeout: 30000,
+                        timeout: 60000, // Increased timeout to 60 seconds for larger files
                     });
 
                     setEpubData(epubResponse.data);
                 } else {
-                    setEpubData(null);
+                    setErrorMessage('This book does not have a readable version available.');
                 }
             } catch (error) {
                 console.error("Error fetching book:", error);
                 if (error.code === 'ECONNABORTED') {
                     setErrorMessage('The e-book download timed out. The file may be too large or the network is slow. Please try again later.');
                 } else {
-                    setErrorMessage('Failed to load the book. Please check the console for details.');
+                    setErrorMessage('Failed to load the book. You may not have access to this resource.');
                 }
                 setBook(null);
             } finally {
@@ -83,7 +83,6 @@ const ReadBookPage = () => {
         );
     }
 
-    // ... the rest of your component is correct and does not need changes ...
     if (errorMessage) {
         return (
             <Box sx={{ p: 4 }}>
@@ -126,13 +125,15 @@ const ReadBookPage = () => {
                     </Tooltip>
                 </Stack>
 
-                <Button
-                    variant="contained"
-                    href={book.contentUrl}
-                    download
-                >
-                    Download EPUB
-                </Button>
+                {book.contentUrl && (
+                    <Button
+                        variant="contained"
+                        href={book.contentUrl}
+                        download
+                    >
+                        Download EPUB
+                    </Button>
+                )}
             </Box>
 
             <div style={{ height: 'calc(100vh - 81px)' }}>

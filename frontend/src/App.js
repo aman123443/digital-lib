@@ -11,8 +11,8 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import RecommendationsPage from './pages/RecommendationsPage';
 import StorePage from './pages/StorePage';
-import ReviewsPage from './pages/ReviewsPage'; // 1. Import the new page
-import Footer from './components/Footer'; // 2. Import the new footer
+import ReviewsPage from './pages/ReviewsPage';
+import Footer from './components/Footer';
 
 import './App.css';
 
@@ -28,7 +28,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {/* This Box component ensures the footer stays at the bottom */}
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <div
           className={`background-container ${mode === 'light' ? 'light-gradient' : 'dark-gradient'}`}
@@ -36,21 +35,33 @@ function App() {
 
         <Navbar toggleTheme={toggleTheme} currentMode={mode} />
 
-        {/* This Box component will grow to fill the available space */}
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}> {/* Added some padding for content */}
           <Routes>
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
-            <Route path="/book/:id" element={<ProtectedRoute><ReadBookPage /></ProtectedRoute>} />
+
+            {/* --- CHANGE 1: Corrected the path for consistency --- */}
+            {/* The "Read" button in your Library page links to /read/:id, so this route must match. */}
+            <Route path="/read/:id" element={<ProtectedRoute><ReadBookPage /></ProtectedRoute>} />
+
             <Route path="/recommendations" element={<ProtectedRoute><RecommendationsPage /></ProtectedRoute>} />
-            <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
-            <Route path="/reviews" element={<ProtectedRoute><ReviewsPage /></ProtectedRoute>} /> {/* 3. Add the new route */}
+
+            {/* --- CHANGE 2: Added the missing route for the store/search page --- */}
+            {/* I am assuming your <StorePage /> component renders the <BookSearch /> component. */}
+            <Route path="/search" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
+
+            <Route path="/reviews" element={<ProtectedRoute><ReviewsPage /></ProtectedRoute>} />
+
+            {/* The old /book/:id route has been removed to avoid confusion. */}
           </Routes>
         </Box>
 
-        <Footer /> {/* 4. Add the Footer component */}
+        <Footer />
       </Box>
     </ThemeProvider>
   );

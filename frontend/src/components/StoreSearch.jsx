@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-// CircularProgress has been removed from this import line
 import { Box, TextField, Button, Grid, Card, CardMedia, CardContent, Typography, Alert, CardActions, Skeleton } from '@mui/material';
 import { motion } from 'framer-motion';
-import api from '../services/api';
+import api from '../services/api'; // Your central axios instance
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-// A new component for the professional skeleton loading effect
+
+// Your professional skeleton loading effect - no changes needed here.
 const SkeletonCard = () => (
     <Card>
         <Skeleton variant="rectangular" height={200} />
@@ -37,8 +38,12 @@ const StoreSearch = () => {
         setResults([]);
 
         try {
-            const response = await api.get(`/store/search?query=${query}`);
-            const data = response.data;
+            // --- CHANGE 1: Corrected the Search URL ---
+            // This now points to the '/api/v1/books/search' endpoint we created in your backend.
+            const response = await api.get(`/api/v1/books/search?query=${query}`);
+
+            // The response from our backend is a raw JSON string from Google, so we need to parse it.
+            const data = JSON.parse(response.data);
 
             if (data.items) {
                 setResults(data.items);
@@ -53,6 +58,28 @@ const StoreSearch = () => {
         }
     };
 
+    // --- CHANGE 2: Added the handleAddBook Function ---
+    // This function sends the book data to your protected backend endpoint to save it.
+    const handleAddBook = async (bookData) => {
+        try {
+            const bookToAdd = {
+                title: bookData.volumeInfo.title,
+                author: bookData.volumeInfo.authors ? bookData.volumeInfo.authors.join(', ') : 'Unknown Author',
+                isbn: bookData.volumeInfo.industryIdentifiers?.find(id => id.type === "ISBN_13")?.identifier,
+                description: bookData.volumeInfo.description,
+                contentUrl: bookData.accessInfo?.epub?.downloadLink,
+                readUrl: bookData.volumeInfo?.previewLink
+            };
+
+            // Our 'api' instance automatically adds the JWT token for this protected request.
+            await api.post('/api/v1/books', bookToAdd);
+            alert(`'${bookToAdd.title}' was successfully added to your library!`);
+        } catch (error) {
+            console.error("Error adding book:", error);
+            alert('Failed to add book. You must be logged in to do this.');
+        }
+    };
+
     return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h4" gutterBottom>
@@ -63,7 +90,7 @@ const StoreSearch = () => {
                     <TextField
                         fullWidth
                         variant="outlined"
-                        placeholder="Search for any book to buy..."
+                        placeholder="Search for any book..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -125,12 +152,15 @@ const StoreSearch = () => {
                                                 {book.volumeInfo.authors?.join(', ')}
                                             </Typography>
                                         </CardContent>
-                                        <CardActions sx={{ display: 'flex', justifyContent: 'space-around', p: 2 }}>
-                                            <Button size="small" href={book.volumeInfo.infoLink} target="_blank" rel="noopener noreferrer" variant="outlined">
-                                                Google Play
-                                            </Button>
-                                            <Button size="small" href={`https://www.amazon.com/s?k=${encodeURIComponent(book.volumeInfo.title)}`} target="_blank" rel="noopener noreferrer" variant="outlined" color="secondary">
-                                                Amazon
+                                        <CardActions sx={{ display: 'flex', justifyContent: 'space-around', p: 1 }}>
+                                            {/* --- CHANGE 3: Added the "Add to My Library" Button --- */}
+                                            <Button
+                                                size="small"
+                                                onClick={() => handleAddBook(book)}
+                                                variant="contained"
+                                                startIcon={<AddCircleOutlineIcon />}
+                                            >
+                                                Add to Library
                                             </Button>
                                         </CardActions>
                                     </Card>
