@@ -54,7 +54,7 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                             onClose={handleClose}
                         >
                             {/* You can still add links to your pages here in the user dropdown menu */}
-                          
+
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>

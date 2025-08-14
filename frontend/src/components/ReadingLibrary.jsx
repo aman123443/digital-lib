@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box, Typography, TextField, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
+import api from '../services/api'; // Your central axios instance from api.js
 
 const ReadingLibrary = () => {
   const [books, setBooks] = useState([]);
@@ -14,8 +14,11 @@ const ReadingLibrary = () => {
       try {
         setLoading(true);
         setError('');
-        // Fetches books for the logged-in user from your backend
-        const response = await api.get('/api/v1/books');
+
+        // --- THIS IS THE CORRECTED LINE ---
+        // The path now correctly starts with '/v1/books', not '/api/v1/books'.
+        const response = await api.get('/v1/books');
+
         setBooks(response.data);
       } catch (error) {
         console.error("There was an error fetching your books!", error);
@@ -76,7 +79,7 @@ const ReadingLibrary = () => {
           </Grid>
         )) : (
             <Typography sx={{ mt: 2, ml: 1 }}>
-                Your library is empty. Go to the 'Find New Books' page to add some!
+                Your library is empty. Go to the 'Add Book' page to add some books!
             </Typography>
         )}
       </Grid>
