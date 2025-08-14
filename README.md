@@ -102,4 +102,4 @@ This project requires the following environment variables to be set on the deplo
 
 **Aman**
 * **GitHub:** [@aman123443](https://github.com/aman123443)
-* **LinkedIn:** *(Add your LinkedIn profile URL here)*
+* **LinkedIn:** *(https://www.linkedin.com/in/aman-shaikh-0ba36a244)*
