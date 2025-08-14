@@ -16,7 +16,8 @@ const ReadingLibrary = () => {
         setError('');
 
         // --- THIS IS THE CORRECTED LINE ---
-        // The path now correctly starts with '/v1/books', not '/api/v1/books'.
+        // The path now correctly starts with '/v1/books'.
+        // Your central 'api.js' file automatically adds the '/api' prefix.
         const response = await api.get('/v1/books');
 
         setBooks(response.data);
