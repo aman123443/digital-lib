@@ -3,10 +3,9 @@ import { Box, TextField, Button, Grid, Card, CardMedia, CardContent, Typography,
 import { motion } from 'framer-motion';
 import api from '../services/api'; // Your central axios instance
 import SearchOffIcon from '@mui/icons-material/SearchOff';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import axios from 'axios'; // We need axios for direct API calls to Google
 
-
-// Your professional skeleton loading effect - no changes needed here.
+// Skeleton component for a professional loading effect - no changes needed here.
 const SkeletonCard = () => (
     <Card>
         <Skeleton variant="rectangular" height={200} />
@@ -20,7 +19,6 @@ const SkeletonCard = () => (
     </Card>
 );
 
-
 const StoreSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -31,24 +29,17 @@ const StoreSearch = () => {
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!query.trim()) return;
-
         setIsLoading(true);
         setError('');
         setSearched(true);
         setResults([]);
-
         try {
-            // --- CHANGE 1: Corrected the Search URL ---
-            // This now points to the '/api/v1/books/search' endpoint we created in your backend.
-            const response = await api.get(`/api/v1/books/search?query=${query}`);
-
-            // The response from our backend is a raw JSON string from Google, so we need to parse it.
-            const data = JSON.parse(response.data);
-
-            if (data.items) {
-                setResults(data.items);
-            } else {
-                setResults([]);
+            // This now calls the Google Books API directly from the frontend to fix the error.
+            const googleApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=20`;
+            const response = await axios.get(googleApiUrl);
+            setResults(response.data.items || []);
+            if (!response.data.items) {
+                 setError('No books found for your search.');
             }
         } catch (err) {
             console.error("Error searching store:", err);
@@ -58,20 +49,17 @@ const StoreSearch = () => {
         }
     };
 
-    // --- CHANGE 2: Added the handleAddBook Function ---
-    // This function sends the book data to your protected backend endpoint to save it.
+    // This function adds the book to your personal library by calling your backend.
     const handleAddBook = async (bookData) => {
         try {
             const bookToAdd = {
                 title: bookData.volumeInfo.title,
                 author: bookData.volumeInfo.authors ? bookData.volumeInfo.authors.join(', ') : 'Unknown Author',
-                isbn: bookData.volumeInfo.industryIdentifiers?.find(id => id.type === "ISBN_13")?.identifier,
                 description: bookData.volumeInfo.description,
                 contentUrl: bookData.accessInfo?.epub?.downloadLink,
                 readUrl: bookData.volumeInfo?.previewLink
             };
-
-            // Our 'api' instance automatically adds the JWT token for this protected request.
+            // This is a protected endpoint. The 'api' instance automatically adds the JWT token.
             await api.post('/api/v1/books', bookToAdd);
             alert(`'${bookToAdd.title}' was successfully added to your library!`);
         } catch (error) {
@@ -83,7 +71,7 @@ const StoreSearch = () => {
     return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h4" gutterBottom>
-                Book Store
+                Find New Books
             </Typography>
             <form onSubmit={handleSearch}>
                 <Box sx={{ display: 'flex', mb: 3 }}>
@@ -102,7 +90,6 @@ const StoreSearch = () => {
 
             <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 0.5 }}>
                 {error && <Alert severity="error">{error}</Alert>}
-
                 {isLoading ? (
                     <Grid container spacing={3}>
                         {Array.from(new Array(8)).map((_, index) => (
@@ -122,46 +109,27 @@ const StoreSearch = () => {
                     <Grid container spacing={3}>
                         {results.map((book, index) => (
                             <Grid item key={book.id + index} xs={12} sm={6} md={4} lg={3}>
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
-                                >
-                                    <Card sx={{
-                                        height: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                                        '&:hover': {
-                                            transform: 'scale(1.03)',
-                                            boxShadow: 6,
-                                        }
-                                    }}>
-                                        <CardMedia
-                                            component="img"
-                                            height="200"
-                                            image={book.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192.png?text=No+Cover'}
-                                            alt={book.volumeInfo.title}
-                                            sx={{ objectFit: 'contain', pt: 1 }}
-                                        />
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+                                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                        <CardMedia component="img" height="200" image={book.volumeInfo.imageLinks?.thumbnail || 'https://via.placeholder.com/128x192.png?text=No+Cover'} alt={book.volumeInfo.title} sx={{ objectFit: 'contain', pt: 1 }} />
                                         <CardContent sx={{ flexGrow: 1 }}>
-                                            <Typography gutterBottom variant="h6" component="div" noWrap title={book.volumeInfo.title}>
-                                                {book.volumeInfo.title}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {book.volumeInfo.authors?.join(', ')}
-                                            </Typography>
+                                            <Typography gutterBottom variant="h6" component="div" noWrap title={book.volumeInfo.title}>{book.volumeInfo.title}</Typography>
+                                            <Typography variant="body2" color="text.secondary">{book.volumeInfo.authors?.join(', ')}</Typography>
                                         </CardContent>
-                                        <CardActions sx={{ display: 'flex', justifyContent: 'space-around', p: 1 }}>
-                                            {/* --- CHANGE 3: Added the "Add to My Library" Button --- */}
-                                            <Button
-                                                size="small"
-                                                onClick={() => handleAddBook(book)}
-                                                variant="contained"
-                                                startIcon={<AddCircleOutlineIcon />}
-                                            >
-                                                Add to Library
+                                        <CardActions sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', p: 2 }}>
+                                            {/* This button adds the book to the user's personal library */}
+                                            <Button size="small" onClick={() => handleAddBook(book)} variant="contained" sx={{ mb: 1 }}>
+                                                Add to My Library
                                             </Button>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+                                                 {/* These are your original buttons */}
+                                                <Button size="small" href={book.volumeInfo.infoLink} target="_blank" rel="noopener noreferrer" variant="outlined">
+                                                    Google Play
+                                                </Button>
+                                                <Button size="small" href={`https://www.amazon.com/s?k=${encodeURIComponent(book.volumeInfo.title)}`} target="_blank" rel="noopener noreferrer" variant="outlined" color="secondary">
+                                                    Amazon
+                                                </Button>
+                                            </Box>
                                         </CardActions>
                                     </Card>
                                 </motion.div>

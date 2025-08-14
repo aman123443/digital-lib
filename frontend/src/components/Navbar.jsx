@@ -19,8 +19,6 @@ const Navbar = ({ toggleTheme, currentMode }) => {
         authService.logout();
         handleClose();
         navigate('/login');
-        // A simple navigation is often better than a full page reload
-        // window.location.reload();
     };
 
     return (
@@ -33,20 +31,12 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                     Digital Library
                 </Typography>
 
-                {/* --- THIS NAVIGATION SECTION HAS BEEN UPDATED --- */}
-                {/* These links will now only appear if a user is logged in */}
                 {currentUser && (
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }}>
                         <Stack direction="row" spacing={2}>
-                            <Button color="inherit" component={Link} to="/library">
-                                My Library
-                            </Button>
-                            <Button color="inherit" component={Link} to="/search">
-                                Book Store
-                            </Button>
-                            <Button color="inherit" component={Link} to="/recommendations">
-                                AI Recommendations
-                            </Button>
+                            <Button color="inherit" component={Link} to="/library">My Library</Button>
+                            <Button color="inherit" component={Link} to="/store">Find New Books</Button>
+                            <Button color="inherit" component={Link} to="/recommendations">AI Recommendations</Button>
                         </Stack>
                     </Box>
                 )}
@@ -62,23 +52,7 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                         <IconButton size="large" onClick={handleMenu} color="inherit">
                             <AccountCircle />
                         </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorEl}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            keepMounted
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                            // Styling for the dropdown menu
-                            sx={{
-                                '& .MuiMenu-paper': {
-                                    backdropFilter: 'blur(10px)',
-                                    backgroundColor: 'rgba(70, 70, 70, 0.2)', // Example dark-blurry menu
-                                    borderRadius: 2,
-                                },
-                            }}
-                        >
+                        <Menu id="menu-appbar" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>

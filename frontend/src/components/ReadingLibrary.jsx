@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box, Typography, TextField, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
-import api from '../services/api'; // Your central axios instance from api.js
+import api from '../services/api';
 
 const ReadingLibrary = () => {
   const [books, setBooks] = useState([]);
@@ -14,10 +14,8 @@ const ReadingLibrary = () => {
       try {
         setLoading(true);
         setError('');
-        // --- THIS IS THE KEY CHANGE ---
-        // We now fetch from the protected '/api/v1/books' endpoint.
-        // The 'api' object automatically attaches the user's JWT token.
-        const response = await api.get('/v1/books');
+        // Fetches books for the logged-in user from your backend
+        const response = await api.get('/api/v1/books');
         setBooks(response.data);
       } catch (error) {
         console.error("There was an error fetching your books!", error);
@@ -68,13 +66,8 @@ const ReadingLibrary = () => {
                     <Typography gutterBottom variant="h6" component="div">{book.title}</Typography>
                     <Typography variant="body2" color="text.secondary">{book.author}</Typography>
                 </CardContent>
-
-                {/* --- NEW BUTTONS ADDED HERE --- */}
                 <CardActions>
-                    {/* The "Read" button navigates to your reader page */}
                     <Button size="small" component={Link} to={`/read/${book.id}`}>Read</Button>
-
-                    {/* The "Download" button uses the contentUrl if it exists */}
                     {book.contentUrl && (
                         <Button size="small" href={book.contentUrl} target="_blank" rel="noopener noreferrer" download>Download</Button>
                     )}
@@ -83,7 +76,7 @@ const ReadingLibrary = () => {
           </Grid>
         )) : (
             <Typography sx={{ mt: 2, ml: 1 }}>
-                Your library is empty. Go to the 'Book Store Search' page to add some books!
+                Your library is empty. Go to the 'Find New Books' page to add some!
             </Typography>
         )}
       </Grid>
