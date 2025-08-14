@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip, Menu, MenuItem, Button, Stack } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip, Menu, MenuItem, Button } from '@mui/material';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Link, useNavigate } from 'react-router-dom';
@@ -31,15 +31,7 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                     Digital Library
                 </Typography>
 
-                {currentUser && (
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }}>
-                        <Stack direction="row" spacing={2}>
-                            <Button color="inherit" component={Link} to="/library">My Library</Button>
-                            <Button color="inherit" component={Link} to="/store">Find New Books</Button>
-                            <Button color="inherit" component={Link} to="/recommendations">AI Recommendations</Button>
-                        </Stack>
-                    </Box>
-                )}
+                {/* The central navigation links have been removed as requested. */}
 
                 <Tooltip title={currentMode === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}>
                     <IconButton sx={{ ml: 1 }} onClick={toggleTheme} color="inherit">
@@ -52,7 +44,19 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                         <IconButton size="large" onClick={handleMenu} color="inherit">
                             <AccountCircle />
                         </IconButton>
-                        <Menu id="menu-appbar" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            keepMounted
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            {/* You can still add links to your pages here in the user dropdown menu */}
+                            <MenuItem component={Link} to="/library" onClick={handleClose}>My Library</MenuItem>
+                            <MenuItem component={Link} to="/store" onClick={handleClose}>Find Books</MenuItem>
+                            <MenuItem component={Link} to="/recommendations" onClick={handleClose}>AI Recommendations</MenuItem>
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>
