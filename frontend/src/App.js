@@ -35,7 +35,7 @@ function App() {
 
         <Navbar toggleTheme={toggleTheme} currentMode={mode} />
 
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}> {/* Added some padding for content */}
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
@@ -44,20 +44,14 @@ function App() {
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
-
-            {/* --- CHANGE 1: Corrected the path for consistency --- */}
-            {/* The "Read" button in your Library page links to /read/:id, so this route must match. */}
             <Route path="/read/:id" element={<ProtectedRoute><ReadBookPage /></ProtectedRoute>} />
-
             <Route path="/recommendations" element={<ProtectedRoute><RecommendationsPage /></ProtectedRoute>} />
 
-            {/* --- CHANGE 2: Added the missing route for the store/search page --- */}
-            {/* I am assuming your <StorePage /> component renders the <BookSearch /> component. */}
-            <Route path="/search" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
+            {/* --- THIS IS THE CORRECTED LINE --- */}
+            {/* The path is now "/store" to match the button in your Home.jsx */}
+            <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
 
             <Route path="/reviews" element={<ProtectedRoute><ReviewsPage /></ProtectedRoute>} />
-
-            {/* The old /book/:id route has been removed to avoid confusion. */}
           </Routes>
         </Box>
 
