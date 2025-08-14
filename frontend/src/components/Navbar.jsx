@@ -28,7 +28,7 @@ const Navbar = ({ toggleTheme, currentMode }) => {
                     <MenuBookIcon sx={{ mr: 1 }} />
                 </IconButton>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    Digital Library
+                 Welcome to Librify
                 </Typography>
 
                 {/* The central navigation links have been removed as requested. */}

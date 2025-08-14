@@ -26,7 +26,7 @@ const Home = () => {
           transition={{ duration: 0.8 }}
         >
           <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Welcome to Your Digital Library
+            Welcome to Your Librify
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: '600px', mx: 'auto' }}>
             Discover, read, and get intelligent recommendations for your next favorite book.
