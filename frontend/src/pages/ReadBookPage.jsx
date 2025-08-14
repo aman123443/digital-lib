@@ -7,20 +7,18 @@ import { Box, Typography, Button, CircularProgress, IconButton, Tooltip, Stack, 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
+// --- THIS IS THE FIX ---
+// 1. Define the base API URL using the environment variable, just like in the other files.
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const ReadBookPage = () => {
     const { id } = useParams();
     const [book, setBook] = useState(null);
     const [epubData, setEpubData] = useState(null);
     const [loadingMessage, setLoadingMessage] = useState('Loading book details...');
     const [errorMessage, setErrorMessage] = useState('');
-
-    // State for reader location (page), retrieved from local storage
     const [location, setLocation] = useState(localStorage.getItem(`book-progress-${id}`) || null);
-
-    // State for font size
     const [fontSize, setFontSize] = useState(100);
-
-    // Ref to access the reader's internal methods
     const readerRef = useRef(null);
 
     useEffect(() => {
@@ -28,17 +26,21 @@ const ReadBookPage = () => {
             try {
                 setLoadingMessage('Loading book details...');
                 setErrorMessage('');
+                // This 'api.get' call is likely already correct if you have a central api service file
                 const response = await api.get(`/books/${id}`);
                 const bookData = response.data;
                 setBook(bookData);
 
                 if (bookData && bookData.contentUrl) {
                     setLoadingMessage('Downloading e-book (this may take a moment)...');
-                    const proxyUrl = `http://localhost:8080/api/books/proxy-epub?url=${encodeURIComponent(bookData.contentUrl)}`;
+
+                    // --- THIS LINE IS NOW CORRECTED ---
+                    // 2. It now uses the API_URL variable instead of the hardcoded localhost.
+                    const proxyUrl = `${API_URL}/api/books/proxy-epub?url=${encodeURIComponent(bookData.contentUrl)}`;
 
                     const epubResponse = await axios.get(proxyUrl, {
                         responseType: 'arraybuffer',
-                        timeout: 30000, // 30 second timeout for large files
+                        timeout: 30000,
                     });
 
                     setEpubData(epubResponse.data);
@@ -60,14 +62,11 @@ const ReadBookPage = () => {
         fetchBook();
     }, [id]);
 
-    // This function is called by the reader whenever the page changes
     const handleLocationChanged = (epubcifi) => {
-        // Save the new location to local storage
         localStorage.setItem(`book-progress-${id}`, epubcifi);
         setLocation(epubcifi);
     };
 
-    // Function to change the font size in the reader
     const changeFontSize = (newSize) => {
         setFontSize(newSize);
         if(readerRef.current) {
@@ -84,6 +83,7 @@ const ReadBookPage = () => {
         );
     }
 
+    // ... the rest of your component is correct and does not need changes ...
     if (errorMessage) {
         return (
             <Box sx={{ p: 4 }}>
@@ -98,7 +98,6 @@ const ReadBookPage = () => {
 
     return (
         <div>
-            {/* Professional Header */}
             <Box
                 sx={{
                     p: 2,
@@ -113,7 +112,6 @@ const ReadBookPage = () => {
                     {book.title}
                 </Typography>
 
-                {/* Font Size Controls */}
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mx: 2 }}>
                     <Tooltip title="Decrease font size">
                         <IconButton onClick={() => changeFontSize(Math.max(80, fontSize - 10))}>
@@ -137,13 +135,11 @@ const ReadBookPage = () => {
                 </Button>
             </Box>
 
-            {/* The E-book Reader */}
             <div style={{ height: 'calc(100vh - 81px)' }}>
                 <ReactReader
                     location={location}
                     locationChanged={handleLocationChanged}
                     url={epubData}
-                    // This gets a ref to the epubjs instance so we can control it
                     getRendition={(rendition) => {
                         readerRef.current = rendition;
                         rendition.themes.fontSize(`${fontSize}%`);

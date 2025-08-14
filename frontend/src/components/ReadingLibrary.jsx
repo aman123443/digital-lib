@@ -4,12 +4,18 @@ import axios from 'axios';
 import BookCard from './BookCard';
 import { Link } from 'react-router-dom';
 
+// --- THIS IS THE FIX ---
+// 1. Define the base API URL using the environment variable.
+//    This works for both production (Vercel) and local development.
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const ReadingLibrary = () => {
   const [books, setBooks] = React.useState([]);
   const [searchTerm, setSearchTerm] = React.useState('');
 
   React.useEffect(() => {
-    axios.get('http://localhost:8080/api/books/public')
+    // 2. Use the API_URL variable to construct the full request URL.
+    axios.get(`${API_URL}/api/books/public`) // This line is now corrected
       .then(response => {
         setBooks(response.data);
       })
@@ -38,7 +44,6 @@ const ReadingLibrary = () => {
       />
       <Grid container spacing={3}>
         {filteredBooks.map(book => (
-          // This now uses the correct Grid v2 syntax
           <Grid key={book.id} xs={12} sm={6} md={4} lg={3}>
             <Link to={`/book/${book.id}`} style={{ textDecoration: 'none' }}>
               <BookCard book={book} />
