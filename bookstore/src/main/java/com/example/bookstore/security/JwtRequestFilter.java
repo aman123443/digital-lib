@@ -1,3 +1,4 @@
+// src/main/java/com/example/bookstore/security/JwtRequestFilter.java
 package com.example.bookstore.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,41 +20,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Autowired private UserDetailsService userDetailsService;
+    @Autowired private JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String requestURI = request.getRequestURI();
-
-        // This list now correctly matches the SecurityConfig
-        List<String> publicEndpoints = List.of(
-                "/api/auth",
-                "/api/v1/books/public"
-        );
-
-        boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(requestURI::startsWith);
-
-        if (isPublicEndpoint) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // ... rest of your JWT validation logic is fine and does not need changes ...
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
@@ -67,9 +46,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtUtil.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken token =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
                     token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(token);
                 }

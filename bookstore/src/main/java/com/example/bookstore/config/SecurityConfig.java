@@ -4,7 +4,7 @@ import com.example.bookstore.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod; // <-- Make sure to add this import
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -34,12 +34,16 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // --- THIS IS THE NEW LINE THAT FIXES THE CORS ERROR ---
                         // Allow all OPTIONS requests (for CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Your existing public endpoints
-                        .requestMatchers("/api/auth/**", "/api/v1/books/public","/health").permitAll()
+                        // Your existing public endpoints plus the new recommendation endpoint
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/v1/books/public",
+                                "/api/v1/recommendations/**", // <-- THIS IS THE FIX
+                                "/health"
+                        ).permitAll()
 
                         // All other requests must be authenticated
                         .anyRequest().authenticated()

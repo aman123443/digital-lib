@@ -1,3 +1,4 @@
+
 package com.example.bookstore.security;
 
 import io.jsonwebtoken.Claims;
@@ -18,17 +19,20 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration:3600000}") // Default 1 hour in milliseconds
+    @Value("${jwt.expiration:86400000}") // Default 24 hours
     private long expiration;
 
+    // Extract username from token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    // Extract expiration date from token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    // Generic method to extract a claim
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -42,8 +46,15 @@ public class JwtUtil {
                 .getBody();
     }
 
+    // Check if the token is expired
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    // Generate a token for a user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        // You can add more claims here if needed
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -57,12 +68,9 @@ public class JwtUtil {
                 .compact();
     }
 
+    // Validate the token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
     }
 }

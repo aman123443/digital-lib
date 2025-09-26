@@ -1,3 +1,4 @@
+// src/main/java/com/example/bookstore/controller/AuthController.java
 package com.example.bookstore.controller;
 
 import com.example.bookstore.dto.AuthResponse;
@@ -22,7 +23,6 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000") // Allow React frontend
 public class AuthController {
 
     @Autowired private AuthenticationManager authenticationManager;
@@ -35,10 +35,7 @@ public class AuthController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.username(),
-                            loginRequest.password()
-                    )
+                    new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
             );
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body("Invalid username or password");
@@ -52,24 +49,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> saveUser(@RequestBody SignUpRequest signUpRequest) {
-        // Check if username already exists
-        Optional<User> existingUser = userRepository.findByUsername(signUpRequest.username());
-        if (existingUser.isPresent()) {
+        if (userRepository.findByUsername(signUpRequest.username()).isPresent()) {
             return ResponseEntity.badRequest().body("Username is already taken");
         }
-
-        // Check if email already exists
-        Optional<User> existingEmail = userRepository.findByEmail(signUpRequest.email());
-        if (existingEmail.isPresent()) {
+        if (userRepository.findByEmail(signUpRequest.email()).isPresent()) {
             return ResponseEntity.badRequest().body("Email is already registered");
         }
 
-        // Create new user
         User newUser = new User();
         newUser.setUsername(signUpRequest.username());
         newUser.setEmail(signUpRequest.email());
         newUser.setPassword(passwordEncoder.encode(signUpRequest.password()));
-        newUser.setRoles(Set.of(Role.ROLE_USER));
+        newUser.setRoles(Set.of(Role.ROLE_USER)); // Assign default role
 
         userRepository.save(newUser);
 

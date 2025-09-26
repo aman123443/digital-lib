@@ -5,24 +5,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// A simple DTO to receive the user's prompt
+// A simple DTO to receive the user's prompt from the frontend
 record RecommendationRequest(String prompt) {}
 
 @RestController
-@RequestMapping("/api/recommendations")
+@RequestMapping("/api/v1/recommendations") // Using a versioned API path is good practice
 public class RecommendationController {
 
     @Autowired
     private RecommendationService recommendationService;
 
-    /**
-     * This method is now a standard, non-reactive (no Mono) endpoint.
-     * It directly calls the synchronous service method and returns the result,
-     * which resolves the ".map() is not a function" error.
-     */
     @PostMapping
     public ResponseEntity<String> getRecommendation(@RequestBody RecommendationRequest request) {
+        // It's good practice to validate the input
+        if (request.prompt() == null || request.prompt().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Prompt cannot be empty.");
+        }
+
         String recommendation = recommendationService.getBookRecommendation(request.prompt());
         return ResponseEntity.ok(recommendation);
     }
 }
+

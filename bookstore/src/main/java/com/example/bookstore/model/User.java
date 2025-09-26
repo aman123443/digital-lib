@@ -1,3 +1,4 @@
+// src/main/java/com/example/bookstore/model/User.java
 package com.example.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,10 +14,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String username;
     private String email;
-
     @JsonIgnore
     private String password;
 

@@ -1,3 +1,4 @@
+// src/main/java/com/example/bookstore/service/CustomUserDetailsService.java
 package com.example.bookstore.service;
 
 import com.example.bookstore.model.User;
@@ -22,9 +23,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.name()))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList())
+        );
     }
 }
