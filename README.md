@@ -10,8 +10,7 @@ Librify is a modern, full-stack web application designed for book lovers. It ser
 
 | Home Page | My Library | Book Search | AI Recommendations |
 | :---: | :---: | :---: | :---: |
-| ![Home Page](https://github.com/user-attachments/assets/cda2c839-9950-4b2e-b04a-2b5975a9cf10)
-8-7f3b-489f-8fa3-a61da4229d0f) | ![My Library Page](https://github.com/user-attachments/assets/3fbcde78-7f3b-489f-8fa3-a61da4229d0f) | ![Book Search Page](https://github.com/user-attachments/assets/a686221b-254d-4589-8cb7-a465fb7c0e21) | ![AI Chatbot](https://github.com/user-attachments/assets/1b244ecf-38cf-4dad-aaee-bb59bfbe6141) |
+| ![Home Page](https://github.com/user-attachments/assets/cda2c839-9950-4b2e-b04a-2b5975a9cf10) | ![My Library Page](https://github.com/user-attachments/assets/3fbcde78-7f3b-489f-8fa3-a61da4229d0f) | ![Book Search Page](https://github.com/user-attachments/assets/a686221b-254d-4589-8cb7-a465fb7c0e21) | ![AI Chatbot](https://github.com/user-attachments/assets/1b244ecf-38cf-4dad-aaee-bb59bfbe6141) |
 
 
 * **Secure User Authentication:** Full registration and login functionality using a secure JWT-based system.
