@@ -34,18 +34,16 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all OPTIONS requests (for CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Your existing public endpoints plus the new recommendation endpoint
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/v1/books/public",
-                                "/api/v1/recommendations/**", // <-- THIS IS THE FIX
-                                "/health"
+                                "/api/v1/recommendations/**",
+                                "/health",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
-
-                        // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
