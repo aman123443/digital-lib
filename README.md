@@ -6,17 +6,18 @@ Librify is a modern, full-stack web application designed for book lovers. It ser
 
 ## ✨ Key Features & Screenshots
 
-*(**Action:** Take screenshots of your live application and replace the placeholder links below. You can upload images directly to your GitHub repository and get a link.)*
+*(**Action:** Ensure these screenshots are clean and clearly show the functionality.)*
 
-| Reading Library | Book Search | AI Recommendations |
-| :---: | :---: | :---: |
-| ![Reading Library](https://via.placeholder.com/300x200.png?text=Yo<img width="1872" height="902" alt="Screenshot 2025-11-08 233717" src="https://github.com/user-attachments/assets/3fbcde78-7f3b-489f-8fa3-a61da4229d0f" />
-| ![Book Search](https://via.placeholder.com/300x200<img width="1895" height="900" alt="Screenshot 2025-11-08 233855" src="https://github.com/user-attachments/assets/a686221b-254d-4589-8cb7-a465fb7c0e21" /> | ![AI Recommendations](https://via.placeholder.com/300<img width="1904" height="905" alt="Screenshot 2025-11-08 234027" src="https://github.com/user-attachments/assets/1b244ecf-38cf-4dad-aaee-bb59bfbe6141" />) |
+| Home Page | My Library | Book Search | AI Recommendations |
+| :---: | :---: | :---: | :---: |
+| ![Home Page](https://github.com/user-attachments/assets/3fbcde78-7f3b-489f-8fa3-a61da4229d0f) | ![My Library Page](https://github.com/user-attachments/assets/a686221b-254d-4589-8cb7-a465fb7c0e21) | ![Book Search Page](https://github.com/user-attachments/assets/a686221b-254d-4589-8cb7-a465fb7c0e21) | ![AI Chatbot](https://github.com/user-attachments/assets/1b244ecf-38cf-4dad-aaee-bb59bfbe6141) |
+
 
 * **Secure User Authentication:** Full registration and login functionality using a secure JWT-based system.
+* **Intuitive Home Page:** A welcoming landing page for users to begin their book journey.
 * **Personal Digital Library:** Registered users can manage a personal collection of books they have saved.
 * **Book Discovery:** Search for any book in the world using a direct integration with the Google Books API.
-* **Add to Library:** Users can add books found via search to their personal library. *(Note: This feature was designed but then reverted per your request. You can re-add it or remove this line.)*
+* **Add to Library:** Users can add books found via search to their personal library.
 * **AI-Powered Recommendations:** A chatbot interface powered by the Google Gemini API provides intelligent and personalized book suggestions based on user prompts.
 * **Responsive Design:** The user interface, built with React and Material-UI, is fully responsive and provides a seamless experience on desktop and mobile devices.
 
