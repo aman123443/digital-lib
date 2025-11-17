@@ -1,27 +1,44 @@
-import React, { createContext, useState, useEffect } from 'react';
-import authService from '../services/authService'; // Your existing authService
+import axios from "axios";
 
-// 1. Create the context
-export const AuthContext = createContext(null);
+const API_URL = "http://localhost:8080/api/auth";
 
-// 2. Create the provider component
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+export const login = async (username, password) => {
+    try {
+        const response = await axios.post(`${API_URL}/login`, {
+            username: username,
+            password: password
+        });
 
-    // 3. Check for a logged-in user when the app first loads
-    useEffect(() => {
-        const currentUser = authService.getCurrentUser();
-        if (currentUser) {
-            setUser(currentUser);
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token);
         }
-    }, []);
 
-    // 4. Provide the user state and a function to update it to the rest of the app
-    const authValue = { user, setUser };
+        return response.data;
 
-    return (
-        <AuthContext.Provider value={authValue}>
-            {children}
-        </AuthContext.Provider>
-    );
+    } catch (error) {
+        console.error("LOGIN ERROR:", error.response?.data || error.message);
+        throw error;
+    }
 };
+
+export const register = async (username, email, password) => {
+    try {
+        const response = await axios.post(`${API_URL}/register`, {
+            username,
+            email,
+            password
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("REGISTER ERROR:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const getCurrentUser = () => {
+    const token = localStorage.getItem("token");
+    return token ? { token } : null;
+};
+
+export default { login, register, getCurrentUser };
